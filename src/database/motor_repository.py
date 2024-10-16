@@ -36,7 +36,7 @@ class MotorRepository:
     async def find_motors_by_userid(self, userid: str):
         c = self.collection_motor
         l = []
-        async for document in c.find({"userid": {"$eq": ObjectId(userid)}}):
+        async for document in c.find({"userid": {"$eq": userid}}):
             l.append(document)
             pprint.pprint(document)
         return l

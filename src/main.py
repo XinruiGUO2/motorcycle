@@ -3,9 +3,9 @@
 from fastapi import FastAPI,HTTPException
 import uvicorn
 
-from database.motor_repository import MotorRepository
-from database.user_repository import UserRepository
-from src.model.RESTModel import Motorcycle
+from src.database.motor_repository import MotorRepository
+from src.database.user_repository import UserRepository
+from src.model.RESTModel import Motorcycle, User
 from src.database.mongodb_client import MongoDBClient
 
 app = FastAPI()
@@ -31,6 +31,15 @@ async def create_user(username: str):
     else:
         raise HTTPException(status_code=400, detail="User is already exited ")
 
+@app.get("/user/{user_id}")
+async def ge_user(user_id: str):
+    user_exit = await user_repository.is_user_exist(user_id)
+    if user_exit is False:
+        inserted_id = await user_repository.do_find_one_user(user_id)
+        return {"user": str(inserted_id)}
+    else:
+        raise HTTPException(status_code=400, detail="User is already exited ")
+
 
 @app.post("/motorcycles")
 async def add_motorcycle(item: Motorcycle):
@@ -42,9 +51,9 @@ async def add_motorcycle(item: Motorcycle):
         raise HTTPException(status_code=400, detail="Motor is already exited ")
 
 
-@app.get("/motorcycles")
-async def list_motorcycles():
-    result = await motor_repository.do_find()
+@app.get("/motorcycles/list/{user_id}")
+async def list_user_motorcycles(user_id: str):
+    result = await motor_repository.find_motors_by_userid(user_id)
     return {"motorcycles_list": str(result)}
 
 
